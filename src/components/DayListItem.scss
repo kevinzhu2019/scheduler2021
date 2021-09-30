@@ -1,5 +1,5 @@
-@import "styles/mixins.scss";
-@import "styles/variables.scss";
+@import "../styles/mixins.scss";
+@import "../styles/variables.scss";
 
 .day-list {
   &__item {
@@ -22,6 +22,10 @@
       background-color: darken($white, 5%);
       color: $dark-background;
       padding-left: 2rem;//manually added
+      height: 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
       &:hover {
         background-color: darken($white, 5%);
@@ -31,6 +35,10 @@
     &--full {
       opacity: $inactive-opacity;
       padding-left: 2rem;//manually added
+      height: 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
   }
 }

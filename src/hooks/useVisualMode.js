@@ -29,5 +29,5 @@ export default function useVisualMode(initial) {
 }
 
 /**
- * replace参数的意思，如果是true，把history里的最后一个状态删掉，把自己填上，这样back的时候就能回到第一个状态
+ * replace参数的意思，如果是true，把history里的最后一个状态删掉，把自己填上，这样back的时候就能回到第一个状态（back时必须把最新的状态弹掉pop掉）
  */

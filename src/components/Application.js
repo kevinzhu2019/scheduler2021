@@ -4,7 +4,7 @@ import axios from "axios";
 import "./Application.scss";
 import DayList from "./DayList";
 import Appointment from "components/Appointment/index";
-import {getAppointmentsForDay, getInterview} from "helpers/selectors";
+import {getAppointmentsForDay, getInterview, getInterviewersForDay} from "helpers/selectors";
 
 export default function Application() {
 
@@ -20,6 +20,14 @@ export default function Application() {
   const setDay = newDay => setState(prev => ({...prev, day: newDay}));
   // const setDays = newDays => setState(prev => ({...prev, days: newDays}));
 
+  const bookInterview = (id, interview) => {
+    const appointment = {...state.appointments[id], interview: interview};
+    const appointments = {...state.appointments, [id]: appointment};
+    setState(prev => ({...prev, appointments: appointments}));
+    // console.log(state.appointments[id]) 这里用consolelog看不到update，因为useState是异步调用
+    axios.put(`/api/appointments/${id}`, {interview});
+  }
+
   useEffect(() => {
     Promise.all([
       axios.get("/api/days"),
@@ -31,6 +39,7 @@ export default function Application() {
   }, []);
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
+  const dailyInterviewers = getInterviewersForDay(state, state.day);
 
   const appointmentList = dailyAppointments.map(appointment => {
     const interview = getInterview(state, appointment.interview);
@@ -40,6 +49,8 @@ export default function Application() {
         id={appointment.id}
         time={appointment.time}
         interview={interview}
+        interviewers={dailyInterviewers}
+        bookInterview={bookInterview}
       />
     )
   });

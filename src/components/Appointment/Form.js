@@ -37,9 +37,14 @@ export default function Form(props) {
       <section className="appointment__card-right">
         <section className="appointment__actions">
           <Button danger onClick={cancel}>Cancel</Button>
-          <Button confirm onClick={props.onSave}>Save</Button>
+          <Button confirm onClick={() => props.onSave(name, interviewer)}>Save</Button>
         </section>
       </section>
     </main>
   )
 }
+
+/**
+ * Props.onSave方法里的bookInterview方法由Application经由Appointment传递过来，包含在onSave方法里。
+ * 一旦按下Save按钮，触发onSave方法把typein的name和选定的interviewer给到onSave（也就是save）方法组建一个interview对象，然后在save方法里call bookInterview方法把刚建的interview对象和appointment id作为参数。bookInterview需要写api server，必须在Application组件里完成
+ */

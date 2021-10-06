@@ -22,7 +22,19 @@ function getInterview(state, interview) {
   return interviewToReturn;
 }
 
-export {getAppointmentsForDay, getInterview}
+function getInterviewersForDay(state, day) {
+  const interviewersForDay = [];
+  for(const oneDay of state.days) {
+    if(oneDay.name === day) {
+      for(const interviewer of oneDay.interviewers) {
+        interviewersForDay.push(state.interviewers[interviewer]);
+      }
+    }
+  }
+  return interviewersForDay;
+}
+
+export {getAppointmentsForDay, getInterview, getInterviewersForDay}
 /**
  * 注意第15行，新建一个专门用于返回的interview Obj，千万不能直接把传入的interview参数改掉，会造成crash，
  * 具体表现：点击一个day，再点击另一个day，然后回到第一个day，React crash

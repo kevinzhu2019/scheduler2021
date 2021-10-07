@@ -20,12 +20,22 @@ export default function Application() {
   const setDay = newDay => setState(prev => ({...prev, day: newDay}));
   // const setDays = newDays => setState(prev => ({...prev, days: newDays}));
 
-  const bookInterview = (id, interview) => {
+  const bookInterview = async (id, interview) => {
     const appointment = {...state.appointments[id], interview: interview};
     const appointments = {...state.appointments, [id]: appointment};
     setState(prev => ({...prev, appointments: appointments}));
     // console.log(state.appointments[id]) 这里用consolelog看不到update，因为useState是异步调用
-    axios.put(`/api/appointments/${id}`, {interview});
+    await axios.put(`/api/appointments/${id}`, {interview});
+  }
+
+  const cancelInterview = async id => {
+    const deletedAppointment = {
+      ...state.appointments[id], interview: null
+    }
+    const appointments = {
+      ...state.appointments, [id]: deletedAppointment}
+    setState(prev => ({...prev, appointments: appointments}))//这次看看需不需要刷state
+    await axios.delete(`/api/appointments/${id}`, deletedAppointment);
   }
 
   useEffect(() => {
@@ -51,6 +61,7 @@ export default function Application() {
         interview={interview}
         interviewers={dailyInterviewers}
         bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
       />
     )
   });

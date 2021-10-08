@@ -34,7 +34,15 @@ function getInterviewersForDay(state, day) {
   return interviewersForDay;
 }
 
-export {getAppointmentsForDay, getInterview, getInterviewersForDay}
+function getSpotsForDay(state, day) {
+  for(let i = 0; i < state.days.length; i++) {
+    if(day === state.days[i].name) {
+      return state.days[i].spots;
+    }
+  }
+}
+
+export {getAppointmentsForDay, getInterview, getInterviewersForDay, getSpotsForDay}
 /**
  * 注意第15行，新建一个专门用于返回的interview Obj，千万不能直接把传入的interview参数改掉，会造成crash，
  * 具体表现：点击一个day，再点击另一个day，然后回到第一个day，React crash

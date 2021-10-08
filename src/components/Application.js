@@ -4,7 +4,7 @@ import axios from "axios";
 import "./Application.scss";
 import DayList from "./DayList";
 import Appointment from "components/Appointment/index";
-import {getAppointmentsForDay, getInterview, getInterviewersForDay} from "helpers/selectors";
+import {getAppointmentsForDay, getInterview, getInterviewersForDay, getSpotsForDay} from "helpers/selectors";
 
 export default function Application() {
 
@@ -32,10 +32,23 @@ export default function Application() {
     const deletedAppointment = {
       ...state.appointments[id], interview: null
     }
-    const appointments = {
-      ...state.appointments, [id]: deletedAppointment}
-    setState(prev => ({...prev, appointments: appointments}))//这次看看需不需要刷state
+    // const appointments = {
+    //   ...state.appointments, [id]: deletedAppointment
+    // }
+    // setState(prev => ({...prev, appointments: appointments}))//这次看看需不需要刷state
     await axios.delete(`/api/appointments/${id}`, deletedAppointment);
+  }
+
+  const setSpots = (day, newSpots) => {
+    const newDays = [...state.days];
+    for(let i = 0; i < newDays.length; i++) {
+      if(day === newDays[i].name) {
+        newDays[i] = {
+          ...newDays[i], spots: newSpots
+        }
+      }
+    }
+    setState(prev => ({...prev, days: newDays}));
   }
 
   useEffect(() => {
@@ -51,6 +64,8 @@ export default function Application() {
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
 
+  const dailySpots = getSpotsForDay(state, state.day);
+
   const appointmentList = dailyAppointments.map(appointment => {
     const interview = getInterview(state, appointment.interview);
     return (
@@ -62,6 +77,9 @@ export default function Application() {
         interviewers={dailyInterviewers}
         bookInterview={bookInterview}
         cancelInterview={cancelInterview}
+        dailySpots={dailySpots}
+        day={state.day}
+        setSpots={setSpots}
       />
     )
   });
@@ -95,3 +113,7 @@ export default function Application() {
     </main>
   );
 }
+
+/**
+ * 在cancelInterview里，当一个interview被delete以后，不需要对本地的state重写，设想在error handling状态下，api server写入失败，这样close error message以后应该能回到之前的状态，如果在delete是刷写了state，那么在close error message 以后系统会找不到props而crash
+ */

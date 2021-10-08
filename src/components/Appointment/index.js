@@ -7,6 +7,7 @@ import Empty from "components/Appointment/Empty";
 import Form from "components/Appointment/Form";
 import Status from "components/Appointment/Status";
 import Confirm from "components/Appointment/Confirm";
+import Error from "components/Appointment/Error";
 import useVisualMode from "hooks/useVisualMode";
 
 export default function Appointment(props) {
@@ -20,6 +21,8 @@ export default function Appointment(props) {
   const DELETING = "DELETING";
   const CONFIRM = "CONFIRM";
   const EDIT = "EDIT";
+  const ERROR_SAVE = "ERROR_SAVE";
+  const ERROR_DELETE = "ERROR_DELETE";
 
   const {mode, transition, back} = useVisualMode(props.interview ? SHOW : EMPTY);
 
@@ -38,13 +41,23 @@ export default function Appointment(props) {
       interviewer
     }
     props.bookInterview(props.id, interview)
-    .then((res) => transition(SHOW));
+    .then(() => {
+      transition(SHOW);
+      props.setSpots(props.day, props.dailySpots - 1);
+    })
+    .catch(error => {
+      transition(ERROR_SAVE, true);
+    });
   }
 
   const deleteInterview = (id) => {
-    transition(DELETING)
+    transition(DELETING, true)
     props.cancelInterview(id)
-    .then((res) => transition(EMPTY))
+    .then(res => {
+      transition(EMPTY);
+      props.setSpots(props.day, props.dailySpots + 1);
+    })
+    .catch(() => transition(ERROR_DELETE, true));
   }
 
   const confirm = () => {
@@ -53,6 +66,10 @@ export default function Appointment(props) {
 
   const edit = () => {
     transition(EDIT);
+  }
+
+  const onClose = () => {
+    back();
   }
 
   return (
@@ -105,6 +122,18 @@ export default function Appointment(props) {
           interviewer={props.interview.interviewer.id}//此处要传递的是id，而不是整个interviewer obj
           onCancel={onCancel}
           onSave={save}
+        />
+      )}
+      {mode === ERROR_SAVE && (
+        <Error
+          message={"Could not save the new appointment, try again later!"}
+          onClose={onClose}
+        />
+      )}
+      {mode === ERROR_DELETE && (
+        <Error 
+          message={"Could not delete the appointment, try again later!"}
+          onClose={onClose}
         />
       )}
     </article>
